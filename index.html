@@ -1,0 +1,133 @@
+<script type="text/javascript">
+  var gk_isXlsx = false;
+  var gk_xlsxFileLookup = {};
+  var gk_fileData = {};
+  function filledCell(cell) {
+    return cell !== "" && cell != null;
+  }
+  function loadFileData(filename) {
+    if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+      try {
+        var workbook = XLSX.read(gk_fileData[filename], { type: "base64" });
+        var firstSheetName = workbook.SheetNames[0];
+        var worksheet = workbook.Sheets[firstSheetName];
+
+        // Convert sheet to JSON to filter blank rows
+        var jsonData = XLSX.utils.sheet_to_json(worksheet, {
+          header: 1,
+          blankrows: false,
+          defval: "",
+        });
+        // Filter out blank rows (rows where all cells are empty, null, or undefined)
+        var filteredData = jsonData.filter((row) => row.some(filledCell));
+
+        // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+        var headerRowIndex = filteredData.findIndex(
+          (row, index) =>
+            row.filter(filledCell).length >=
+            filteredData[index + 1]?.filter(filledCell).length
+        );
+        // Fallback
+        if (headerRowIndex === -1 || headerRowIndex > 25) {
+          headerRowIndex = 0;
+        }
+
+        // Convert filtered JSON back to CSV
+        var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+        csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+        return csv;
+      } catch (e) {
+        console.error(e);
+        return "";
+      }
+    }
+    return gk_fileData[filename] || "";
+  }
+</script>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>تهنئة عيد الأضحى</title>
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Orbitron:wght@400..900&family=Reem+Kufi+Fun:wght@400..700&family=Reem+Kufi:wght@400..700&family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet"> -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="container mx-auto p-4">
+      <h1 class="text-3xl font-bold text-center mb-6">
+        إنشاء بطاقة تهنئة عيد الأضحى
+      </h1>
+
+      <!-- Form for user input -->
+      <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <div class="mb-4">
+          <label for="userName" class="block text-lg font-medium mb-2"
+            >أدخل اسمك:</label
+          >
+          <input
+            type="text"
+            id="userName"
+            class="w-full p-2 border rounded-md"
+            placeholder="اكتب اسمك هنا" />
+        </div>
+        <div class="mb-4">
+          <label for="userImage" class="block text-lg font-medium mb-2"
+            >اختر صورة:</label
+          >
+          <input
+            type="file"
+            id="userImage"
+            accept="image/*"
+            class="w-full p-2 border rounded-md" />
+        </div>
+        <button
+          onclick="generateCard()"
+          class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+          إنشاء البطاقة
+        </button>
+      </div>
+
+      <!-- Greeting card display -->
+      <div
+        id="greetingCard"
+        class="hidden bg-white   p-6 rounded-lg shadow-md text-center  greetingCard">
+        <div class="images">
+        <img src="./images/back.png" class="image"/>
+        <img
+            id="cardImage"
+            class="w-100 h-100 mx-auto rounded-4 mb-4 object-cover "
+            src=""
+            alt="صورة المستخدم" />
+        </div>
+        <div>
+          <div class="text-center mb-4">
+            <h2 class="text-2xl font-bold text-green-800 mb-2" id="eid">عيد أضحى مبارك</h2>
+            <p class="text-lg text-gray-700">كل عام وأنتم إلى الله أقرب، وإلى الخير أسبق، وللفردوس أرغب</p>
+          </div>
+           <span id="cardNameText"></span>
+
+              <h2 id="cardName" class="text-2xl font-bold text-green-800 mb-4">
+ </h2>
+   </div>
+     
+         
+        </div>
+        <button
+          onclick="downloadCard()"
+          class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 downlod">
+          تحميل البطاقة
+        </button>
+      </div>
+    </div>
+<div class="fixed bottom-0 left-0 w-full bg-gray-800 text-white text-center p-2">
+      <p class="text-sm">تم تطوير هذا الموقع بواسطة <a href="
+    <div class="fixed bottom-0 left-0 w-full bg-gray-800 text-white text-center p-2">
+      <p class="text-sm">جميع الحقوق محفوظة &copy; 2023</p>
+    </div>
+</div>
+    <script src="./js/script.js"></script>
+  </body>
+</html>
