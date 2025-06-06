@@ -57,8 +57,12 @@
 @media (max-width: 768px) {
     .greetingCard {
         background-image: url("../images/phone.jpeg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border: 2px solid #4682b4;
         width: 95vw;
-        height: 75vh;
+        height: 600px;
     }
     .images {
         flex-direction: column-reverse;
