@@ -58,7 +58,7 @@
     .greetingCard {
         background-image: url("../images/phone.jpeg");
         width: 95vw;
-        height: 85vh;
+        height: 75vh;
     }
     .images {
         flex-direction: column-reverse;
